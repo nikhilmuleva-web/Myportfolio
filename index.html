@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Nikhil Muleva | WordPress Developer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --cyan: #00f0ff;
+    --purple: #a259ff;
+    --bg: #050a14;
+    --bg2: #080f1e;
+    --text: #e0e6f0;
+    --muted: #7a90b0;
+    --card: rgba(255,255,255,0.03);
+    --border: rgba(0,240,255,0.12);
+  }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Rajdhani', 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; }
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: rgba(0,240,255,0.3); border-radius: 3px; }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 999;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 6%; height: 68px;
+    transition: background 0.4s, border-bottom 0.4s;
+  }
+  nav.scrolled {
+    background: rgba(5,10,20,0.96);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border);
+  }
+  .logo {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.5rem; font-weight: 900;
+    color: var(--cyan);
+    text-shadow: 0 0 22px rgba(0,240,255,0.5);
+    cursor: pointer; text-decoration: none;
+    letter-spacing: 3px;
+  }
+  .nav-links { display: flex; gap: 2rem; list-style: none; }
+  .nav-links a {
+    text-decoration: none; font-weight: 600; font-size: 0.88rem;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--muted); padding-bottom: 3px;
+    border-bottom: 2px solid transparent;
+    transition: color 0.3s, border-color 0.3s;
+  }
+  .nav-links a:hover, .nav-links a.active { color: var(--cyan); border-color: var(--cyan); }
+  .hamburger { display: none; background: none; border: none; color: var(--cyan); font-size: 1.6rem; cursor: pointer; }
+  @media(max-width:768px) {
+    .hamburger { display: block; }
+    .nav-links { display: none; flex-direction: column; position: fixed; top: 68px; left: 0; right: 0; background: rgba(5,10,20,0.98); padding: 2rem 6%; gap: 1.4rem; }
+    .nav-links.open { display: flex; }
+  }
+
+  /* ── HERO ── */
+  #home {
+    min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    text-align: center; padding: 110px 6% 80px; position: relative;
+    background: radial-gradient(ellipse at 65% 35%, rgba(0,240,255,0.07) 0%, transparent 65%),
+                radial-gradient(ellipse at 20% 75%, rgba(162,89,255,0.07) 0%, transparent 60%);
+  }
+  .grid-bg {
+    position: absolute; inset: 0; pointer-events: none;
+    background-image: linear-gradient(rgba(0,240,255,0.025) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(0,240,255,0.025) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+  .hero-inner { position: relative; z-index: 1; max-width: 800px; }
+  .badge {
+    display: inline-block; margin-bottom: 1.4rem;
+    background: rgba(0,240,255,0.1); border: 1px solid rgba(0,240,255,0.35);
+    border-radius: 20px; padding: 6px 20px;
+    font-size: 0.75rem; letter-spacing: 3px; color: var(--cyan); text-transform: uppercase;
+  }
+  .badge::before { content: "● "; color: #00ff88; font-size: 0.65rem; }
+  h1.hero-name {
+    font-size: clamp(2.8rem, 8vw, 5.5rem); font-weight: 900; line-height: 1.05;
+    margin-bottom: 1rem;
+    background: linear-gradient(135deg, #fff 30%, var(--cyan) 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .typing-wrap { font-size: clamp(1.1rem, 3vw, 1.75rem); font-weight: 700; color: var(--purple); min-height: 2.2rem; margin-bottom: 1.4rem; }
+  .cursor-blink { display: inline-block; width: 3px; height: 1.1em; background: var(--cyan); margin-left: 3px; vertical-align: text-bottom; animation: blink 0.8s step-end infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+  .hero-desc { color: var(--muted); font-size: 1.05rem; line-height: 1.75; max-width: 580px; margin: 0 auto 2.5rem; }
+  .btn-row { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+  .btn-primary {
+    padding: 14px 36px; background: linear-gradient(135deg, var(--cyan), #0070f3);
+    color: #050a14; font-weight: 700; border: none; border-radius: 8px; cursor: pointer;
+    font-size: 1rem; letter-spacing: 1px; font-family: inherit;
+    box-shadow: 0 0 24px rgba(0,240,255,0.35);
+    transition: transform 0.2s, box-shadow 0.2s; text-decoration: none; display: inline-block;
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 44px rgba(0,240,255,0.55); }
+  .btn-outline {
+    padding: 14px 36px; background: transparent; color: var(--cyan); font-weight: 700;
+    border: 2px solid var(--cyan); border-radius: 8px; cursor: pointer;
+    font-size: 1rem; letter-spacing: 1px; font-family: inherit;
+    transition: background 0.3s; text-decoration: none; display: inline-block;
+  }
+  .btn-outline:hover { background: rgba(0,240,255,0.1); }
+
+  /* ── SECTIONS ── */
+  section { padding: 90px 6%; }
+  .container { max-width: 1140px; margin: 0 auto; }
+  .section-label { font-size: 0.75rem; letter-spacing: 4px; color: var(--cyan); text-transform: uppercase; margin-bottom: 0.4rem; }
+  .section-title { font-size: clamp(2rem, 5vw, 3rem); font-weight: 900; color: #fff; margin-bottom: 0.8rem; }
+  .divider { width: 60px; height: 4px; background: linear-gradient(90deg, var(--cyan), var(--purple)); border-radius: 2px; margin-bottom: 3rem; }
+
+  /* ── ABOUT ── */
+  #about { background: var(--bg); }
+  .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
+  @media(max-width:768px){ .about-grid { grid-template-columns: 1fr; gap: 2.5rem; } }
+  .avatar {
+    width: 240px; height: 240px; border-radius: 50%; margin: 0 auto;
+    background: linear-gradient(135deg, rgba(0,240,255,0.15), rgba(162,89,255,0.15));
+    border: 3px solid rgba(0,240,255,0.4);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 5.5rem;
+    box-shadow: 0 0 60px rgba(0,240,255,0.15);
+    animation: float 4s ease-in-out infinite;
+  }
+  @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-14px)} }
+  .about-text { color: var(--muted); line-height: 1.8; font-size: 1rem; margin-bottom: 1.5rem; }
+  .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem 1.5rem; margin-bottom: 2rem; }
+  .info-item { font-size: 0.9rem; color: var(--muted); }
+  .info-item strong { color: var(--text); font-weight: 600; }
+
+  /* ── SKILLS ── */
+  #skills { background: rgba(0,240,255,0.015); }
+  .skills-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.4rem; }
+  .skill-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 1.4rem;
+    transition: border-color 0.3s;
+  }
+  .skill-card:hover { border-color: rgba(0,240,255,0.4); }
+  .skill-top { display: flex; justify-content: space-between; margin-bottom: 0.75rem; font-weight: 600; font-size: 0.95rem; }
+  .skill-pct { color: var(--cyan); }
+  .skill-pct.purple { color: var(--purple); }
+  .bar-bg { height: 6px; background: rgba(255,255,255,0.07); border-radius: 3px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 3px; width: 0; transition: width 1.3s ease; }
+  .bar-fill.cyan { background: linear-gradient(90deg, var(--cyan), var(--purple)); }
+  .bar-fill.purple { background: linear-gradient(90deg, var(--purple), var(--cyan)); }
+
+  /* ── EXPERIENCE ── */
+  #experience { background: var(--bg); }
+  .exp-card {
+    background: var(--card); border-radius: 12px; padding: 2rem; margin-bottom: 1.8rem;
+    transition: transform 0.3s;
+  }
+  .exp-card:hover { transform: translateX(6px); }
+  .exp-card.cyan { border-left: 4px solid var(--cyan); border: 1px solid rgba(0,240,255,0.2); border-left: 4px solid var(--cyan); }
+  .exp-card.purple { border-left: 4px solid var(--purple); border: 1px solid rgba(162,89,255,0.2); border-left: 4px solid var(--purple); }
+  .exp-header { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.6rem; margin-bottom: 0.8rem; }
+  .exp-company { font-size: 1.15rem; font-weight: 800; color: #fff; }
+  .exp-role { font-weight: 600; margin-top: 3px; }
+  .exp-role.cyan { color: var(--cyan); }
+  .exp-role.purple { color: var(--purple); }
+  .exp-period {
+    border-radius: 20px; padding: 4px 14px; font-size: 0.8rem; font-weight: 600;
+    height: fit-content; align-self: flex-start;
+  }
+  .exp-period.cyan { background: rgba(0,240,255,0.1); border: 1px solid rgba(0,240,255,0.35); color: var(--cyan); }
+  .exp-period.purple { background: rgba(162,89,255,0.1); border: 1px solid rgba(162,89,255,0.35); color: var(--purple); }
+  .exp-list { padding-left: 1.2rem; color: var(--muted); line-height: 2.1; font-size: 0.94rem; }
+
+  /* ── EDUCATION ── */
+  #education { background: rgba(162,89,255,0.015); }
+  .edu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; }
+  .edu-card {
+    background: var(--card); border: 1px solid rgba(162,89,255,0.15);
+    border-radius: 14px; padding: 1.8rem;
+    transition: border-color 0.3s, transform 0.3s;
+  }
+  .edu-card:hover { border-color: rgba(162,89,255,0.45); transform: translateY(-4px); }
+  .edu-icon { font-size: 2rem; margin-bottom: 0.8rem; }
+  .edu-degree { font-size: 1.05rem; font-weight: 800; color: #fff; margin-bottom: 0.3rem; }
+  .edu-school { font-size: 0.88rem; color: var(--muted); line-height: 1.5; margin-bottom: 0.6rem; }
+  .edu-year { font-size: 0.8rem; color: var(--purple); font-weight: 600; letter-spacing: 1px; }
+  .edu-score { font-size: 0.85rem; color: var(--cyan); font-weight: 700; margin-top: 0.3rem; }
+
+  /* ── PROJECTS ── */
+  #projects { background: var(--bg); }
+  .projects-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem; }
+  .proj-card {
+    background: var(--card); border: 1px solid rgba(162,89,255,0.15);
+    border-radius: 14px; padding: 1.8rem; text-decoration: none; color: inherit; display: block;
+    transition: border-color 0.3s, transform 0.3s, background 0.3s;
+  }
+  .proj-card:hover { border-color: rgba(162,89,255,0.55); transform: translateY(-5px); background: rgba(162,89,255,0.05); }
+  .proj-icon { font-size: 1.4rem; margin-bottom: 0.5rem; }
+  .proj-name { font-size: 1rem; font-weight: 800; color: #fff; margin-bottom: 0.5rem; }
+  .proj-desc { font-size: 0.88rem; color: var(--muted); line-height: 1.65; margin-bottom: 0.8rem; }
+  .tags { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.8rem; }
+  .tag {
+    padding: 3px 11px; border-radius: 20px; font-size: 0.72rem; font-weight: 700;
+    background: rgba(0,240,255,0.08); color: var(--cyan);
+    border: 1px solid rgba(0,240,255,0.25); letter-spacing: 1px; text-transform: uppercase;
+  }
+  .proj-link { font-size: 0.84rem; color: var(--cyan); font-weight: 700; }
+
+  /* ── CONTACT ── */
+  #contact { background: rgba(0,240,255,0.015); }
+  .contact-box {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 18px; padding: 3rem; max-width: 680px; margin: 0 auto; text-align: center;
+  }
+  .contact-intro { color: var(--muted); font-size: 1.05rem; line-height: 1.75; margin-bottom: 2rem; }
+  .contact-items { display: flex; flex-direction: column; gap: 1.2rem; text-align: left; }
+  .contact-item { display: flex; align-items: center; gap: 1rem; }
+  .contact-icon {
+    width: 44px; height: 44px; border-radius: 10px;
+    background: rgba(0,240,255,0.08); border: 1px solid rgba(0,240,255,0.2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.2rem; flex-shrink: 0;
+  }
+  .contact-label { font-size: 0.74rem; color: #3a5a7a; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 2px; }
+  .contact-val { font-weight: 600; color: var(--text); font-size: 0.95rem; }
+  .contact-val a { color: var(--cyan); text-decoration: none; }
+  .contact-val a:hover { text-decoration: underline; }
+  .contact-btn-wrap { margin-top: 2.5rem; }
+
+  /* ── FOOTER ── */
+  footer {
+    text-align: center; padding: 2rem 5%;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    color: #3a4a5a; font-size: 0.85rem;
+  }
+  footer span { color: var(--cyan); }
+
+  /* ── SCROLL REVEAL ── */
+  .reveal { opacity: 0; transform: translateY(44px); transition: opacity 0.7s ease, transform 0.7s ease; }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="navbar">
+  <a href="#home" class="logo">NM</a>
+  <button class="hamburger" id="hamburger" aria-label="Menu">☰</button>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="#home" class="active">Home</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#experience">Experience</a></li>
+    <li><a href="#education">Education</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="home">
+  <div class="grid-bg"></div>
+  <div class="hero-inner">
+    <div class="badge">Available for Work</div>
+    <h1 class="hero-name">Nikhil Muleva</h1>
+    <div class="typing-wrap">
+      <span id="typed"></span><span class="cursor-blink"></span>
+    </div>
+    <p class="hero-desc">
+      Highly disciplined WordPress Developer with expertise in responsive web design, Elementor-based development, and front-end technologies. Based in Indore, M.P.
+    </p>
+    <div class="btn-row">
+      <a href="#projects" class="btn-primary">View Projects</a>
+      <a href="#contact" class="btn-outline">Contact Me</a>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-label">01 — Who I Am</div>
+      <h2 class="section-title">About Me</h2>
+      <div class="divider"></div>
+      <div class="about-grid">
+        <div style="text-align:center;">
+          <div class="avatar">👨💻</div>
+        </div>
+        <div>
+          <p class="about-text">
+            I am a creative and detail-oriented WordPress Developer with hands-on experience building responsive, high-performing websites. I specialize in Elementor-based development and have delivered projects across law, healthcare, food, and digital marketing industries.
+          </p>
+          <div class="info-grid">
+            <div class="info-item">Name: <strong>Nikhil Muleva</strong></div>
+            <div class="info-item">Location: <strong>Indore, M.P.</strong></div>
+            <div class="info-item">Degree: <strong>B.Tech (CSE)</strong></div>
+            <div class="info-item">CGPA: <strong>8.31 / 10</strong></div>
+            <div class="info-item">Email: <strong>nikhilmuleva2019@gmail.com</strong></div>
+            <div class="info-item">Phone: <strong>+91 9926816686</strong></div>
+            <div class="info-item">Languages: <strong>English, Hindi</strong></div>
+            <div class="info-item">Hobbies: <strong>Cricket 🏏</strong></div>
+          </div>
+          <a href="https://www.linkedin.com/in/nikhil-muleva-2a442b219/" target="_blank" rel="noopener" class="btn-primary" style="font-size:0.9rem;padding:12px 28px;">LinkedIn Profile →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-label">02 — What I Know</div>
+      <h2 class="section-title">Technical Skills</h2>
+      <div class="divider"></div>
+      <div class="skills-grid" id="skillsGrid">
+        <!-- JS will inject -->
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EXPERIENCE -->
+<section id="experience">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-label">03 — Where I've Worked</div>
+      <h2 class="section-title">Work Experience</h2>
+      <div class="divider"></div>
+
+      <div class="exp-card cyan">
+        <div class="exp-header">
+          <div>
+            <div class="exp-company">Wiz91 Technologies Private Limited</div>
+            <div class="exp-role cyan">WordPress Developer</div>
+          </div>
+          <div class="exp-period cyan">March 2025 – May 2025</div>
+        </div>
+        <ul class="exp-list">
+          <li>Created different types of responsive websites.</li>
+          <li>Collaborated with senior developers to implement design changes.</li>
+          <li>Worked on themes: Tanda, Woodmart on WordPress.</li>
+          <li>Plugins used: Elementor, Royal Addons, Jeg Elementor, Elements Kit, WP Contact Form, Booking Appointments.</li>
+        </ul>
+      </div>
+
+      <div class="exp-card purple">
+        <div class="exp-header">
+          <div>
+            <div class="exp-company">Chandrawat &amp; Partners</div>
+            <div class="exp-role purple">WordPress Developer</div>
+          </div>
+          <div class="exp-period purple">April 2024 – Feb 2025</div>
+        </div>
+        <ul class="exp-list">
+          <li>Developed responsive web pages using HTML, CSS, and WordPress.</li>
+          <li>Gained experience in front-end development practices and web design principles.</li>
+          <li>Assisted in testing and debugging web applications across browsers and devices.</li>
+          <li>Plugins used: Elementor, Chaty, WP Contact Form.</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- EDUCATION -->
+<section id="education">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-label">04 — My Academic Journey</div>
+      <h2 class="section-title">Education</h2>
+      <div class="divider"></div>
+      <div class="edu-grid">
+        <div class="edu-card">
+          <div class="edu-icon">🎓</div>
+          <div class="edu-degree">Bachelor of Technology (B.Tech)</div>
+          <div class="edu-school">Institute of Engineering &amp; Science, IPS Academy Indore<br>Computer Science &amp; Engineering</div>
+          <div class="edu-year">Aug 2018 – Jun 2022</div>
+          <div class="edu-score">CGPA: 8.31 / 10</div>
+        </div>
+        <div class="edu-card">
+          <div class="edu-icon">📚</div>
+          <div class="edu-degree">Higher Secondary School (12th)</div>
+          <div class="edu-school">Govt. Devi Ahilya H.S. Excellence School Khargone No.1</div>
+          <div class="edu-year">Jun 2017 – Mar 2018</div>
+          <div class="edu-score">Percentage: 68%</div>
+        </div>
+        <div class="edu-card">
+          <div class="edu-icon">🏫</div>
+          <div class="edu-degree">Secondary School (10th)</div>
+          <div class="edu-school">Govt. High School Jamli</div>
+          <div class="edu-year">Jun 2015 – Mar 2016</div>
+          <div class="edu-score">Percentage: 79%</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-label">05 — What I've Built</div>
+      <h2 class="section-title">Projects</h2>
+      <div class="divider"></div>
+      <div class="projects-grid" id="projectsGrid">
+        <!-- JS will inject -->
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-label">06 — Get In Touch</div>
+      <h2 class="section-title">Contact</h2>
+      <div class="divider"></div>
+      <div class="contact-box">
+        <p class="contact-intro">
+          I'm currently open to new opportunities. Whether you have a project in mind or just want to connect — feel free to reach out!
+        </p>
+        <div class="contact-items">
+          <div class="contact-item">
+            <div class="contact-icon">📧</div>
+            <div>
+              <div class="contact-label">Email</div>
+              <div class="contact-val"><a href="mailto:nikhilmuleva2019@gmail.com">nikhilmuleva2019@gmail.com</a></div>
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="contact-icon">📱</div>
+            <div>
+              <div class="contact-label">Phone</div>
+              <div class="contact-val"><a href="tel:+919926816686">+91 9926816686</a></div>
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="contact-icon">📍</div>
+            <div>
+              <div class="contact-label">Location</div>
+              <div class="contact-val">Bhawarkua, Indore (M.P.)</div>
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="contact-icon">💼</div>
+            <div>
+              <div class="contact-label">LinkedIn</div>
+              <div class="contact-val"><a href="https://www.linkedin.com/in/nikhil-muleva-2a442b219/" target="_blank" rel="noopener">linkedin.com/in/nikhil-muleva-2a442b219</a></div>
+            </div>
+          </div>
+        </div>
+        <div class="contact-btn-wrap">
+          <a href="mailto:nikhilmuleva2019@gmail.com" class="btn-primary">Send Message ✉️</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>© 2025 <span>Nikhil Muleva</span> · WordPress Developer · Indore, M.P. · Made with ❤️</p>
+</footer>
+
+<script>
+  // ── SKILLS DATA ──
+  const SKILLS = [
+    { name: "WordPress",        level: 90, t: "cyan"   },
+    { name: "HTML5",            level: 85, t: "purple" },
+    { name: "CSS3",             level: 85, t: "cyan"   },
+    { name: "Elementor",        level: 92, t: "purple" },
+    { name: "JavaScript",       level: 60, t: "cyan"   },
+    { name: "Responsive Design",level: 88, t: "purple" },
+    { name: "MySQL",            level: 55, t: "cyan"   },
+    { name: "Visual Studio Code",level: 75,t: "purple" },
+  ];
+
+  const sg = document.getElementById("skillsGrid");
+  SKILLS.forEach(s => {
+    sg.innerHTML += `
+      <div class="skill-card">
+        <div class="skill-top">
+          <span>${s.name}</span>
+          <span class="skill-pct ${s.t}">${s.level}%</span>
+        </div>
+        <div class="bar-bg">
+          <div class="bar-fill ${s.t}" data-level="${s.level}"></div>
+        </div>
+      </div>`;
+  });
+
+  // ── PROJECTS DATA ──
+  const PROJECTS = [
+    { name:"Chandrawat & Partners.com", url:"https://chandrawatpartners.com/", desc:"Law firm website — About Us, Sectors, Services pages using Elementor. Country-specific pages & blog posts.", tags:["WordPress","HTML","CSS"] },
+    { name:"Chandrawat & Partners.co",  url:"https://chandrawatpartners.co/",  desc:"Published legal blog posts, website maintenance, responsive pages with Elementor.", tags:["WordPress"] },
+    { name:"Raybangroup.in",            url:"https://raybangroup.in/",         desc:"Meat food company — built fully responsive pages using Elementor.", tags:["WordPress"] },
+    { name:"Diabetesspecialistin.com",  url:"https://diabetesspecialistin.com/",desc:"Healthcare website — responsive pages & service subpages using Elementor, HTML & CSS.", tags:["WordPress","HTML","CSS"] },
+    { name:"KBY Technologies",          url:"https://www.kbytechnologies.com/",desc:"Tech company — responsive pages & service subpages using Elementor, HTML & CSS.", tags:["WordPress","HTML","CSS"] },
+    { name:"Bestgynecologistindore.com",url:"https://bestgynecologistindore.com/",desc:"Medical clinic — fully responsive website built with Elementor, HTML & CSS.", tags:["WordPress","HTML","CSS"] },
+    { name:"Digitalmarketingss.com",    url:"https://digitalmarketingss.com/", desc:"Redesigned entire website using Elementor for full responsiveness.", tags:["WordPress"] },
+    { name:"Digital Marketing Doctors", url:"https://digitalmarketingdoctors.in/",desc:"Created many pages with responsive mobile view using Elementor plugins.", tags:["WordPress"] },
+  ];
+
+  const pg = document.getElementById("projectsGrid");
+  PROJECTS.forEach(p => {
+    const tagHTML = p.tags.map(t => `<span class="tag">${t}</span>`).join("");
+    pg.innerHTML += `
+      <a href="${p.url}" target="_blank" rel="noopener" class="proj-card">
+        <div class="proj-icon">🌐</div>
+        <div class="proj-name">${p.name}</div>
+        <div class="proj-desc">${p.desc}</div>
+        <div class="tags">${tagHTML}</div>
+        <div class="proj-link">Visit Site →</div>
+      </a>`;
+  });
+
+  // ── TYPING EFFECT ──
+  const roles = ["WordPress Developer", "Front-End Developer", "Web Designer"];
+  let ri = 0, ci = 0, deleting = false;
+  const typed = document.getElementById("typed");
+  function typeLoop() {
+    const role = roles[ri];
+    if (!deleting) {
+      typed.textContent = role.slice(0, ++ci);
+      if (ci === role.length) { deleting = true; setTimeout(typeLoop, 1300); return; }
+    } else {
+      typed.textContent = role.slice(0, --ci);
+      if (ci === 0) { deleting = false; ri = (ri + 1) % roles.length; }
+    }
+    setTimeout(typeLoop, deleting ? 55 : 95);
+  }
+  setTimeout(typeLoop, 600);
+
+  // ── NAV SCROLL ──
+  const navbar = document.getElementById("navbar");
+  window.addEventListener("scroll", () => {
+    navbar.classList.toggle("scrolled", window.scrollY > 50);
+  });
+
+  // ── HAMBURGER ──
+  document.getElementById("hamburger").addEventListener("click", () => {
+    document.getElementById("navLinks").classList.toggle("open");
+  });
+
+  // ── ACTIVE NAV LINK ──
+  const sections = document.querySelectorAll("section[id]");
+  const navAs = document.querySelectorAll(".nav-links a");
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        navAs.forEach(a => a.classList.remove("active"));
+        const match = document.querySelector(`.nav-links a[href="#${e.target.id}"]`);
+        if (match) match.classList.add("active");
+      }
+    });
+  }, { threshold: 0.4 });
+  sections.forEach(s => io.observe(s));
+
+  // ── SCROLL REVEAL ──
+  const revealEls = document.querySelectorAll(".reveal");
+  const ro = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add("visible"); ro.unobserve(e.target); }
+    });
+  }, { threshold: 0.1 });
+  revealEls.forEach(el => ro.observe(el));
+
+  // ── SKILL BARS ANIMATE ──
+  const barObs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.querySelectorAll(".bar-fill").forEach(b => {
+          b.style.width = b.dataset.level + "%";
+        });
+        barObs.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.2 });
+  barObs.observe(document.getElementById("skillsGrid"));
+</script>
+</body>
+</html>
