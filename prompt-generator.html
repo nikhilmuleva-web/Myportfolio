@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>⚡ Power Prompt Generator — Nikhil Muleva</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --cyan: #00f0ff;
+    --purple: #a259ff;
+    --green: #00ff88;
+    --orange: #ff9500;
+    --bg: #0a0d16;
+    --bg2: #0d1220;
+    --card: rgba(255,255,255,0.04);
+    --border: rgba(0,240,255,0.15);
+    --text: #e0e6f0;
+    --muted: #6a80a0;
+  }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Rajdhani', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: rgba(0,240,255,0.3); border-radius: 3px; }
+
+  /* ── BG GRID ── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background-image:
+      linear-gradient(rgba(0,240,255,0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,240,255,0.02) 1px, transparent 1px);
+    background-size: 50px 50px;
+  }
+
+  /* ── HEADER ── */
+  header {
+    position: relative; z-index: 10;
+    text-align: center;
+    padding: 3rem 2rem 2rem;
+    background: linear-gradient(180deg, rgba(0,240,255,0.05) 0%, transparent 100%);
+    border-bottom: 1px solid var(--border);
+  }
+  .header-icon {
+    font-size: 3rem; margin-bottom: 0.5rem;
+    animation: pulse-icon 2s ease-in-out infinite;
+  }
+  @keyframes pulse-icon {
+    0%,100% { filter: drop-shadow(0 0 8px rgba(255,149,0,0.6)); }
+    50% { filter: drop-shadow(0 0 24px rgba(255,149,0,1)); }
+  }
+  .header-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: clamp(1.6rem, 5vw, 2.6rem);
+    font-weight: 900;
+    letter-spacing: 4px;
+    background: linear-gradient(135deg, var(--orange) 0%, var(--cyan) 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.4rem;
+  }
+  .header-sub {
+    color: var(--muted);
+    font-size: 1rem;
+    letter-spacing: 1px;
+  }
+  .header-sub span { color: var(--cyan); font-weight: 700; }
+
+  /* ── MAIN LAYOUT ── */
+  main {
+    position: relative; z-index: 1;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 4rem;
+  }
+
+  /* ── TABS ── */
+  .tab-bar {
+    display: flex; gap: 0.6rem; flex-wrap: wrap;
+    margin-bottom: 2rem;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 0.5rem;
+  }
+  .tab-btn {
+    flex: 1; min-width: 140px;
+    display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    border: none; border-radius: 10px;
+    background: transparent;
+    color: var(--muted);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.9rem; font-weight: 700;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.25s;
+    white-space: nowrap;
+  }
+  .tab-btn:hover { color: var(--text); background: rgba(255,255,255,0.04); }
+  .tab-btn.active {
+    background: linear-gradient(135deg, rgba(0,240,255,0.15), rgba(162,89,255,0.15));
+    color: var(--cyan);
+    border: 1px solid rgba(0,240,255,0.3);
+    box-shadow: 0 0 20px rgba(0,240,255,0.1);
+  }
+  .tab-icon { font-size: 1.1rem; }
+
+  /* ── PROMPT CARD ── */
+  .prompt-card {
+    background: var(--card);
+    border: 1px solid rgba(162,89,255,0.25);
+    border-radius: 16px;
+    overflow: hidden;
+    display: none;
+    animation: fadeIn 0.35s ease;
+  }
+  .prompt-card.active { display: block; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+
+  .prompt-header {
+    display: flex; align-items: center; gap: 1rem;
+    padding: 1.2rem 1.8rem;
+    background: linear-gradient(90deg, rgba(162,89,255,0.08), transparent);
+    border-bottom: 1px solid rgba(162,89,255,0.2);
+  }
+  .prompt-badge {
+    padding: 5px 16px; border-radius: 20px;
+    font-size: 0.72rem; font-weight: 800;
+    letter-spacing: 2px; text-transform: uppercase;
+    background: linear-gradient(135deg, rgba(162,89,255,0.25), rgba(0,240,255,0.15));
+    border: 1px solid rgba(162,89,255,0.5);
+    color: var(--purple);
+  }
+  .prompt-badge.cyan-badge {
+    background: linear-gradient(135deg, rgba(0,240,255,0.15), rgba(0,255,136,0.1));
+    border-color: rgba(0,240,255,0.5);
+    color: var(--cyan);
+  }
+  .prompt-badge.green-badge {
+    background: linear-gradient(135deg, rgba(0,255,136,0.15), rgba(0,240,255,0.1));
+    border-color: rgba(0,255,136,0.5);
+    color: var(--green);
+  }
+  .prompt-badge.orange-badge {
+    background: linear-gradient(135deg, rgba(255,149,0,0.15), rgba(255,89,89,0.1));
+    border-color: rgba(255,149,0,0.5);
+    color: var(--orange);
+  }
+  .prompt-desc { color: var(--muted); font-size: 0.88rem; }
+
+  .prompt-body {
+    position: relative;
+    padding: 1.8rem;
+  }
+  .prompt-text {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.82rem;
+    line-height: 1.75;
+    color: #c8d8f0;
+    white-space: pre-wrap;
+    word-break: break-word;
+    max-height: 380px;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+  .prompt-text::-webkit-scrollbar { width: 4px; }
+  .prompt-text::-webkit-scrollbar-thumb { background: rgba(162,89,255,0.4); border-radius: 2px; }
+
+  /* ── COPY BUTTON ── */
+  .copy-bar {
+    display: flex; align-items: center; justify-content: center;
+    padding: 1rem 1.8rem 1.5rem;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    gap: 1rem; flex-wrap: wrap;
+  }
+  .copy-btn {
+    display: inline-flex; align-items: center; gap: 0.6rem;
+    padding: 13px 32px;
+    background: linear-gradient(135deg, var(--purple), var(--cyan));
+    color: #050a14; font-weight: 800;
+    border: none; border-radius: 10px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1rem; letter-spacing: 1.5px;
+    cursor: pointer;
+    box-shadow: 0 0 28px rgba(162,89,255,0.35);
+    transition: all 0.25s;
+    position: relative; overflow: hidden;
+  }
+  .copy-btn::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent);
+    opacity: 0; transition: opacity 0.25s;
+  }
+  .copy-btn:hover { transform: translateY(-2px); box-shadow: 0 0 48px rgba(162,89,255,0.55); }
+  .copy-btn:hover::before { opacity: 1; }
+  .copy-btn.copied {
+    background: linear-gradient(135deg, var(--green), var(--cyan));
+    box-shadow: 0 0 28px rgba(0,255,136,0.4);
+  }
+  .copy-count {
+    font-size: 0.8rem; color: var(--muted); letter-spacing: 1px;
+  }
+
+  /* ── HOW TO USE BOX ── */
+  .how-to {
+    margin-top: 2rem;
+    background: rgba(0,240,255,0.03);
+    border: 1px solid rgba(0,240,255,0.12);
+    border-left: 4px solid var(--cyan);
+    border-radius: 12px;
+    padding: 1.2rem 1.6rem;
+    display: flex; gap: 1rem; align-items: flex-start;
+  }
+  .how-to-icon { font-size: 1.4rem; flex-shrink: 0; margin-top: 2px; }
+  .how-to-text { font-size: 0.92rem; line-height: 1.7; color: var(--muted); }
+  .how-to-text strong { color: var(--cyan); }
+  .how-to-steps {
+    display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.6rem;
+  }
+  .step-chip {
+    padding: 4px 14px; border-radius: 20px; font-size: 0.78rem; font-weight: 700;
+    background: rgba(0,240,255,0.08); color: var(--cyan);
+    border: 1px solid rgba(0,240,255,0.2); letter-spacing: 1px;
+  }
+
+  /* ── STATS ROW ── */
+  .stats-row {
+    display: flex; gap: 1rem; flex-wrap: wrap;
+    margin-bottom: 2rem;
+  }
+  .stat-card {
+    flex: 1; min-width: 150px;
+    padding: 1rem 1.3rem;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    text-align: center;
+  }
+  .stat-val {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.5rem; font-weight: 900;
+    color: var(--cyan);
+    display: block;
+  }
+  .stat-lbl { font-size: 0.78rem; color: var(--muted); letter-spacing: 1px; margin-top: 2px; }
+
+  /* ── FOOTER ── */
+  footer {
+    position: relative; z-index: 1;
+    text-align: center; padding: 1.5rem;
+    border-top: 1px solid rgba(255,255,255,0.04);
+    color: var(--muted); font-size: 0.82rem;
+  }
+  footer span { color: var(--cyan); }
+
+  @media(max-width:600px) {
+    .tab-btn { font-size: 0.78rem; padding: 0.6rem 0.7rem; }
+    .prompt-body { padding: 1.2rem; }
+    .copy-bar { padding: 0.8rem 1.2rem 1.2rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="header-icon">⚡</div>
+  <div class="header-title">POWER PROMPT GENERATOR</div>
+  <div class="header-sub"><span>Nikhil Muleva</span> — World-Class Portfolio Prompts</div>
+</header>
+
+<main>
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <span class="stat-val">4</span>
+      <div class="stat-lbl">PROMPT TYPES</div>
+    </div>
+    <div class="stat-card">
+      <span class="stat-val" style="color:var(--purple)">8+</span>
+      <div class="stat-lbl">PROJECTS COVERED</div>
+    </div>
+    <div class="stat-card">
+      <span class="stat-val" style="color:var(--green)">100%</span>
+      <div class="stat-lbl">AI READY</div>
+    </div>
+    <div class="stat-card">
+      <span class="stat-val" style="color:var(--orange)">1</span>
+      <div class="stat-lbl">HTML FILE OUTPUT</div>
+    </div>
+  </div>
+
+  <!-- TAB BAR -->
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab(0)">
+      <span class="tab-icon">🚀</span> Full Portfolio
+    </button>
+    <button class="tab-btn" onclick="switchTab(1)">
+      <span class="tab-icon">🎨</span> Design Only
+    </button>
+    <button class="tab-btn" onclick="switchTab(2)">
+      <span class="tab-icon">📱</span> Responsive Fix
+    </button>
+    <button class="tab-btn" onclick="switchTab(3)">
+      <span class="tab-icon">🌐</span> Deploy Ready
+    </button>
+  </div>
+
+  <!-- PROMPT CARDS -->
+
+  <!-- TAB 0: FULL PORTFOLIO -->
+  <div class="prompt-card active" id="tab-0">
+    <div class="prompt-header">
+      <div class="prompt-badge">MASTER PROMPT — FULL PORTFOLIO</div>
+      <div class="prompt-desc">Complete single-file portfolio with all sections</div>
+    </div>
+    <div class="prompt-body">
+      <div class="prompt-text" id="text-0">Build a world-class, fully animated personal portfolio website for NIKHIL MULEVA — a WordPress Developer from Indore, M.P., India.
+
+==== TECH STACK ====
+- Pure HTML5 + CSS3 + Vanilla JavaScript (NO frameworks, NO npm, zero dependencies)
+- Single .html file — opens directly in any browser with ZERO errors
+- Google Fonts: Orbitron (logo/headings) + Rajdhani (body)
+
+==== DESIGN SYSTEM ====
+Theme: Dark futuristic cyberpunk
+Primary color: #00f0ff (cyan)
+Accent color: #a259ff (purple)
+Background: #050a14 (deep navy-black)
+Card bg: rgba(255,255,255,0.03)
+Grid bg: repeating 60px CSS grid lines at 2.5% cyan opacity
+Scrollbar: 6px, cyan tint
+
+==== SECTIONS (in order) ====
+1. FIXED NAV — Logo "NM" (Orbitron, cyan, glow), links: Home / About / Skills / Experience / Education / Projects / Contact. Blur backdrop on scroll. Mobile hamburger menu.
+
+2. HERO — Full viewport. Radial gradient glows (cyan top-right, purple bottom-left). CSS grid background. Badge: "● Available for Work" (green dot). Name: "Nikhil Muleva" gradient text (white→cyan). Typing animation cycling: "WordPress Developer" / "Front-End Developer" / "Web Designer" with blinking cursor. Desc paragraph. Two buttons: "View Projects" (gradient primary) and "Contact Me" (outline).
+
+3. ABOUT — Two-column grid. Left: floating emoji avatar 👨‍💻 (bounce animation). Right: info grid (Name, Location, Degree: B.Tech CSE, CGPA: 8.31/10, Email: nikhilmuleva2019@gmail.com, Phone: +91 9926816686, Languages: English & Hindi, Hobbies: Cricket 🏏). LinkedIn button.
+
+4. SKILLS — 8 animated progress bars:
+   WordPress 90% | HTML5 85% | CSS3 85% | Elementor 92% | JavaScript 60% | Responsive Design 88% | MySQL 55% | VS Code 75%
+   Bars animate from 0→% on scroll intersection.
+
+5. EXPERIENCE — Two cards with left border:
+   CYAN: Wiz91 Technologies Private Limited | WordPress Developer | March 2025–May 2025
+   Themes: Tanda, Woodmart. Plugins: Elementor, Royal Addons, Jeg Elementor, Elements Kit, WP Contact Form, Booking Appointments.
+   
+   PURPLE: Chandrawat & Partners | WordPress Developer | April 2024–Feb 2025
+   Plugins: Elementor, Chaty, WP Contact Form. Responsive pages, HTML/CSS.
+
+6. EDUCATION — 3 cards:
+   🎓 B.Tech CSE — IPS Academy, Indore (Aug 2018–Jun 2022) CGPA: 8.31/10
+   📚 12th — Govt. Devi Ahilya H.S. Excellence School Khargone (Mar 2018) 68%
+   🏫 10th — Govt. High School Jamli (Mar 2016) 79%
+
+7. PROJECTS — 8 cards (clickable, open in new tab):
+   • chandrawatpartners.com — Law firm, Elementor, country pages, blog
+   • chandrawatpartners.co — Legal blog, maintenance
+   • raybangroup.in — Meat food company, Elementor
+   • diabetesspecialistin.com — Healthcare, Elementor + HTML/CSS
+   • kbytechnologies.com — Tech company pages
+   • bestgynecologistindore.com — Medical clinic
+   • digitalmarketingss.com — Redesigned with Elementor
+   • digitalmarketingdoctors.in — Mobile responsive pages
+
+8. CONTACT — Centered card with: email, phone, location (Bhawarkua, Indore M.P.), LinkedIn. "Send Message" CTA button.
+
+9. FOOTER — "© 2025 Nikhil Muleva · WordPress Developer · Made with ❤️"
+
+==== ANIMATIONS ====
+- Scroll reveal: opacity 0→1 + translateY(44px→0) on IntersectionObserver
+- Skill bars: width 0→N% on scroll
+- Avatar: float (translateY 0 ↔ -14px, 4s loop)
+- Nav active link tracking via IntersectionObserver
+- Typing effect: type + pause 1.3s + delete loop
+- Card hover: translateY(-4px) or translateX(6px)
+- Buttons: glow box-shadow on hover
+
+==== OUTPUT ====
+Single complete index.html file. Zero external dependencies except Google Fonts CDN. Must open and work perfectly offline (except fonts). No console errors.</div>
+    </div>
+    <div class="copy-bar">
+      <button class="copy-btn" id="copy-0" onclick="copyPrompt(0)">
+        📋 Copy Full Prompt
+      </button>
+      <span class="copy-count" id="count-0"></span>
+    </div>
+  </div>
+
+  <!-- TAB 1: DESIGN ONLY -->
+  <div class="prompt-card" id="tab-1">
+    <div class="prompt-header">
+      <div class="prompt-badge cyan-badge">DESIGN PROMPT — VISUAL SYSTEM</div>
+      <div class="prompt-desc">CSS design system, colors, typography & animations only</div>
+    </div>
+    <div class="prompt-body">
+      <div class="prompt-text" id="text-1">Create a premium dark cyberpunk CSS design system for Nikhil Muleva's portfolio website.
+
+==== COLOR PALETTE ====
+--cyan: #00f0ff        → Primary brand, glows, borders, accents
+--purple: #a259ff      → Secondary accent, badges, cards
+--green: #00ff88       → Status indicators (online/available)
+--bg: #050a14          → Main background (deep navy-black)
+--bg2: #080f1e         → Section alternating background
+--text: #e0e6f0        → Primary text
+--muted: #7a90b0       → Subtext, labels, descriptions
+--card: rgba(255,255,255,0.03)    → Glass card background
+--border: rgba(0,240,255,0.12)   → Subtle borders
+
+==== TYPOGRAPHY ====
+Headings/Logo: 'Orbitron' (Google Fonts) — weight 700, 900
+Body/UI: 'Rajdhani' (Google Fonts) — weight 400, 500, 600, 700
+Font import: https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@400;500;600;700
+
+==== GRADIENT RECIPES ====
+Hero name: linear-gradient(135deg, #fff 30%, #00f0ff 100%)
+Primary button: linear-gradient(135deg, #00f0ff, #0070f3)
+Divider bar: linear-gradient(90deg, #00f0ff, #a259ff)
+Skill bar (cyan): linear-gradient(90deg, #00f0ff, #a259ff)
+Skill bar (purple): linear-gradient(90deg, #a259ff, #00f0ff)
+Hero bg glows:
+  radial-gradient(ellipse at 65% 35%, rgba(0,240,255,0.07), transparent 65%)
+  radial-gradient(ellipse at 20% 75%, rgba(162,89,255,0.07), transparent 60%)
+
+==== ANIMATIONS ====
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }  → 0.8s step-end infinite
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-14px)} } → 4s ease-in-out infinite
+
+.scroll-reveal class:
+  opacity: 0; transform: translateY(44px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+.scroll-reveal.visible { opacity: 1; transform: none; }
+
+==== COMPONENT SPECS ====
+Cards: border-radius 12–16px, 1px border, hover scale/translate
+Buttons primary: border-radius 8px, box-shadow 0 0 24px rgba(0,240,255,0.35)
+Buttons hover: translateY(-2px), box-shadow increase to 44px
+Skill bars: height 6px, border-radius 3px, animated width
+Grid background: background-size 60px 60px, 2.5% opacity lines
+Scrollbar: width 6px, thumb rgba(0,240,255,0.3)
+Nav blur: backdrop-filter blur(14px) on scroll
+
+==== BREAKPOINTS ====
+Mobile: max-width 768px
+About grid: 2-col → 1-col
+Skills: auto-fill minmax(280px, 1fr)
+Projects: auto-fill minmax(320px, 1fr)
+Hero font: clamp(2.8rem, 8vw, 5.5rem)
+Section title: clamp(2rem, 5vw, 3rem)
+
+Apply this design system to the existing Nikhil Muleva portfolio HTML. Return fully updated, production-ready CSS only (or embed in style tags).</div>
+    </div>
+    <div class="copy-bar">
+      <button class="copy-btn" id="copy-1" onclick="copyPrompt(1)">
+        📋 Copy Design Prompt
+      </button>
+      <span class="copy-count" id="count-1"></span>
+    </div>
+  </div>
+
+  <!-- TAB 2: RESPONSIVE FIX -->
+  <div class="prompt-card" id="tab-2">
+    <div class="prompt-header">
+      <div class="prompt-badge green-badge">RESPONSIVE PROMPT — MOBILE FIRST</div>
+      <div class="prompt-desc">Fix mobile layout, breakpoints & touch interactions</div>
+    </div>
+    <div class="prompt-body">
+      <div class="prompt-text" id="text-2">Make Nikhil Muleva's portfolio website fully responsive for all devices. Fix every layout issue on mobile, tablet, and desktop.
+
+==== TARGET DEVICES ====
+- Mobile: 320px – 480px (iPhone SE, small Android)
+- Mobile L: 480px – 768px (iPhone Pro Max, large Android)
+- Tablet: 768px – 1024px (iPad, Galaxy Tab)
+- Desktop: 1024px – 1440px
+- Wide: 1440px+
+
+==== HAMBURGER MENU ====
+Desktop (>768px): show horizontal nav-links, hide hamburger button
+Mobile (≤768px): hide nav-links, show ☰ hamburger button
+On click: toggle class "open" on nav-links, display flex, flex-direction column
+Position: fixed, top 68px, left 0, right 0
+Background: rgba(5,10,20,0.98)
+Padding: 2rem 6%, gap: 1.4rem
+
+==== HERO SECTION ====
+Font sizes using clamp():
+  Name: clamp(2.8rem, 8vw, 5.5rem)
+  Typing text: clamp(1.1rem, 3vw, 1.75rem)
+  Section titles: clamp(2rem, 5vw, 3rem)
+Button row: flex-wrap wrap, gap 1rem, justify-content center
+Padding: 110px 6% 80px (top accounts for fixed nav)
+
+==== GRIDS ====
+About grid:
+  Desktop: grid-template-columns 1fr 1fr, gap 4rem
+  Mobile (≤768px): grid-template-columns 1fr, gap 2.5rem
+  
+Skills grid: repeat(auto-fill, minmax(280px, 1fr))
+Education grid: repeat(auto-fill, minmax(280px, 1fr))
+Projects grid: repeat(auto-fill, minmax(320px, 1fr))
+Info grid (about): grid-template-columns 1fr 1fr, gap 0.8rem 1.5rem
+
+==== EXPERIENCE CARDS ====
+exp-header: flex-wrap wrap on mobile
+Period badge: align-self flex-start, white-space nowrap
+Mobile: stack company info and period vertically
+
+==== CONTACT BOX ====
+Max-width 680px, margin auto
+Padding 3rem (desktop) → 1.5rem (mobile ≤480px)
+Contact items: flex-direction column, gap 1.2rem
+Contact icon: width/height 44px flexible
+
+==== AVATAR ====
+Width/height: 240px (desktop) → 180px (mobile ≤480px)
+Font-size: 5.5rem → 4rem on mobile
+Keep float animation on all sizes
+
+==== TOUCH IMPROVEMENTS ====
+All buttons: min touch target 44x44px
+a, button: -webkit-tap-highlight-color: transparent
+Interactive cards: hover states use active: pseudo-class on touch
+
+==== PERFORMANCE ====
+Use will-change: transform on animated elements
+Reduce animation duration on prefers-reduced-motion: reduce media query
+
+Apply all these responsive fixes to the full Nikhil Muleva portfolio HTML. Return the complete fixed HTML file.</div>
+    </div>
+    <div class="copy-bar">
+      <button class="copy-btn" id="copy-2" onclick="copyPrompt(2)">
+        📋 Copy Responsive Prompt
+      </button>
+      <span class="copy-count" id="count-2"></span>
+    </div>
+  </div>
+
+  <!-- TAB 3: DEPLOY READY -->
+  <div class="prompt-card" id="tab-3">
+    <div class="prompt-header">
+      <div class="prompt-badge orange-badge">DEPLOY PROMPT — GITHUB PAGES / NETLIFY</div>
+      <div class="prompt-desc">SEO, meta tags, favicon, OG image & deployment optimization</div>
+    </div>
+    <div class="prompt-body">
+      <div class="prompt-text" id="text-3">Optimize Nikhil Muleva's portfolio for production deployment on GitHub Pages or Netlify. Add all meta tags, SEO, performance improvements and deploy configuration.
+
+==== PERSON DETAILS ====
+Name: Nikhil Muleva
+Title: WordPress Developer
+Location: Indore, Madhya Pradesh, India
+Email: nikhilmuleva2019@gmail.com
+Phone: +91 9926816686
+LinkedIn: https://www.linkedin.com/in/nikhil-muleva-2a442b219/
+GitHub: https://github.com/nikhilmuleva-web/Myportfolio
+Site URL: https://nikhilmuleva-web.github.io/Myportfolio/
+
+==== HEAD META TAGS ====
+Add these to <head>:
+
+<!-- Primary SEO -->
+<meta name="description" content="Nikhil Muleva — WordPress Developer from Indore, M.P. Expert in Elementor, responsive design, HTML5 & CSS3. View portfolio and hire for web projects.">
+<meta name="keywords" content="Nikhil Muleva, WordPress Developer, Elementor, Web Designer, Indore, HTML CSS, Responsive Design, Front-End Developer">
+<meta name="author" content="Nikhil Muleva">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://nikhilmuleva-web.github.io/Myportfolio/">
+
+<!-- Open Graph (Facebook, WhatsApp, LinkedIn preview) -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Nikhil Muleva | WordPress Developer Portfolio">
+<meta property="og:description" content="Creative WordPress Developer specializing in Elementor, responsive web design, and front-end development. Based in Indore, M.P.">
+<meta property="og:url" content="https://nikhilmuleva-web.github.io/Myportfolio/">
+<meta property="og:site_name" content="Nikhil Muleva Portfolio">
+<meta property="og:image" content="https://nikhilmuleva-web.github.io/Myportfolio/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Nikhil Muleva | WordPress Developer">
+<meta name="twitter:description" content="WordPress Developer from Indore, M.P. — Elementor expert, responsive design specialist.">
+<meta name="twitter:image" content="https://nikhilmuleva-web.github.io/Myportfolio/og-image.png">
+
+<!-- Theme Color (browser tab) -->
+<meta name="theme-color" content="#050a14">
+
+==== STRUCTURED DATA (JSON-LD) ====
+Add inside <script type="application/ld+json">:
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "Nikhil Muleva",
+  "jobTitle": "WordPress Developer",
+  "url": "https://nikhilmuleva-web.github.io/Myportfolio/",
+  "email": "nikhilmuleva2019@gmail.com",
+  "telephone": "+91-9926816686",
+  "address": { "@type": "PostalAddress", "addressLocality": "Indore", "addressRegion": "Madhya Pradesh", "addressCountry": "IN" },
+  "sameAs": ["https://www.linkedin.com/in/nikhil-muleva-2a442b219/", "https://github.com/nikhilmuleva-web"]
+}
+
+==== PERFORMANCE ====
+- Add rel="preload" for Google Fonts
+- Add loading="lazy" to any images
+- Minimize inline CSS (already in single file — keep as is)
+- Add <link rel="dns-prefetch" href="//fonts.googleapis.com">
+
+==== GITHUB PAGES DEPLOY STEPS ====
+1. Ensure repo is public: github.com/nikhilmuleva-web/Myportfolio
+2. Go to Settings → Pages
+3. Source: Deploy from branch → main → / (root) → Save
+4. Wait 2–3 minutes → site live at: https://nikhilmuleva-web.github.io/Myportfolio/
+
+==== NETLIFY DEPLOY (ALTERNATIVE) ====
+1. Go to netlify.com → Add new site → Deploy manually
+2. Drag & drop the index.html file
+3. Custom domain (optional): nikhilmuleva.netlify.app
+
+Return the complete updated index.html with all meta tags, structured data, and performance improvements added.</div>
+    </div>
+    <div class="copy-bar">
+      <button class="copy-btn" id="copy-3" onclick="copyPrompt(3)">
+        📋 Copy Deploy Prompt
+      </button>
+      <span class="copy-count" id="count-3"></span>
+    </div>
+  </div>
+
+  <!-- HOW TO USE -->
+  <div class="how-to">
+    <div class="how-to-icon">💡</div>
+    <div>
+      <div class="how-to-text">
+        <strong>How to use:</strong> Tab select karo → Copy karo → ChatGPT / Claude / Gemini mein paste karo → Bol do "Build this exactly" → Pure working HTML milega!
+        <strong>Full Portfolio</strong> prompt sabse powerful hai — woh ek hi baar mein poora portfolio bana dega.
+      </div>
+      <div class="how-to-steps">
+        <span class="step-chip">1. Select Tab</span>
+        <span class="step-chip">2. Copy Prompt</span>
+        <span class="step-chip">3. Paste in AI</span>
+        <span class="step-chip">4. Get HTML</span>
+        <span class="step-chip">5. Deploy 🚀</span>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  <p>⚡ Power Prompt Generator · <span>Nikhil Muleva</span> · WordPress Developer · Indore, M.P.</p>
+</footer>
+
+<script>
+  // ── TAB SWITCHING ──
+  const tabBtns = document.querySelectorAll('.tab-btn');
+  const tabCards = document.querySelectorAll('.prompt-card');
+  function switchTab(idx) {
+    tabBtns.forEach((b,i) => b.classList.toggle('active', i === idx));
+    tabCards.forEach((c,i) => c.classList.toggle('active', i === idx));
+  }
+
+  // ── COPY PROMPT ──
+  const copyCounts = [0, 0, 0, 0];
+  function copyPrompt(idx) {
+    const text = document.getElementById('text-' + idx).textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.getElementById('copy-' + idx);
+      const original = btn.innerHTML;
+      btn.classList.add('copied');
+      btn.innerHTML = '✅ Copied!';
+      copyCounts[idx]++;
+      const countEl = document.getElementById('count-' + idx);
+      countEl.textContent = `Copied ${copyCounts[idx]} time${copyCounts[idx] > 1 ? 's' : ''}`;
+      setTimeout(() => {
+        btn.classList.remove('copied');
+        btn.innerHTML = original;
+      }, 2200);
+    }).catch(() => {
+      // Fallback for older browsers
+      const ta = document.createElement('textarea');
+      ta.value = document.getElementById('text-' + idx).textContent;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      const btn = document.getElementById('copy-' + idx);
+      const original = btn.innerHTML;
+      btn.classList.add('copied');
+      btn.innerHTML = '✅ Copied!';
+      setTimeout(() => { btn.classList.remove('copied'); btn.innerHTML = original; }, 2200);
+    });
+  }
+</script>
+
+</body>
+</html>
